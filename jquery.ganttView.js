@@ -241,23 +241,30 @@ behavior: {
             var rowIdx = 0;
             for (var i = 0; i < data.length; i++) {
                 for (var j = 0; j < data[i].series.length; j++) {
-                    var series = data[i].series[j];
-                    var size = DateUtils.daysBetween(series.start, series.end) + 1;
-					var offset = DateUtils.daysBetween(start, series.start);
-					var block = jQuery("<div>", {
-                        "class": "ganttview-block",
-                        "title": series.name + ", " + size + " days",
-                        "css": {
-                            "width": ((size * cellWidth) - 9) + "px",
-                            "margin-left": ((offset * cellWidth) + 3) + "px"
+                    for(var k = 0; k < data[i].series[j].data.length; k++) {
+                        var series = data[i].series[j].data[k];
+                        var size = DateUtils.daysBetween(series.start, series.end) + 1;
+    					var offset = DateUtils.daysBetween(start, series.start);
+    					var block = jQuery("<div>", {
+                            "class": "ganttview-block",
+                            "title": (( series.label !== undefined)? series.label : ""),
+                            "css": {
+                                "width": (size * cellWidth - 3) + "px",
+                                "margin-left": ((offset * cellWidth)) + "px"
+                            }
+                        });
+                        addBlockData(block, data[i], series);
+                        if (data[i].series[j].color) {
+                            block.css("background-color", data[i].series[j].color);
                         }
-                    });
-                    addBlockData(block, data[i], series);
-                    if (data[i].series[j].color) {
-                        block.css("background-color", data[i].series[j].color);
+                        /*var textblock = jQuery("<div>", { "class": "ganttview-block-text" });
+                        if (data[i].series[j].data[k].label !== undefined)
+                            textblock.text(data[i].series[j].data[k].label);
+                        else
+                            textblock.text("");
+                        block.append(textblock);*/
+                        jQuery(rows[rowIdx]).append(block);
                     }
-                    block.append(jQuery("<div>", { "class": "ganttview-block-text" }).text(size));
-                    jQuery(rows[rowIdx]).append(block);
                     rowIdx = rowIdx + 1;
                 }
             }
@@ -385,11 +392,13 @@ behavior: {
 			var minStart = new Date(); maxEnd = new Date();
 			for (var i = 0; i < data.length; i++) {
 				for (var j = 0; j < data[i].series.length; j++) {
-					var start = Date.parse(data[i].series[j].start);
-					var end = Date.parse(data[i].series[j].end)
-					if (i == 0 && j == 0) { minStart = start; maxEnd = end; }
-					if (minStart.compareTo(start) == 1) { minStart = start; }
-					if (maxEnd.compareTo(end) == -1) { maxEnd = end; }
+                    for (var k = 0; k< data[i].series[j].data.length; k++) {
+    					var start = Date.parse(data[i].series[j].data[k].start);
+    					var end = Date.parse(data[i].series[j].data[k].end)
+    					if (i == 0 && j == 0 & k == 0) { minStart = start; maxEnd = end; }
+    					if (minStart.compareTo(start) == 1) { minStart = start; }
+    					if (maxEnd.compareTo(end) == -1) { maxEnd = end; }
+                    }
 				}
 			}
 			
