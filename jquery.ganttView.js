@@ -159,8 +159,12 @@ behavior: {
         function addHzHeader(div, dates, cellWidth) {
             var headerDiv = jQuery("<div>", { "class": "ganttview-hzheader" });
             var monthsDiv = jQuery("<div>", { "class": "ganttview-hzheader-months" });
+            var weeksDiv = jQuery("<div>", { "class": "ganttview-hzheader-weeks"});
             var daysDiv = jQuery("<div>", { "class": "ganttview-hzheader-days" });
             var totalW = 0;
+            console.log(dates)
+            var weeks = [];
+            var lastwk = 0;
 			for (var y in dates) {
 				for (var m in dates[y]) {
 					var w = dates[y][m].length * cellWidth;
@@ -172,12 +176,28 @@ behavior: {
 					for (var d in dates[y][m]) {
 						daysDiv.append(jQuery("<div>", { "class": "ganttview-hzheader-day" })
 							.append(dates[y][m][d].getDate()));
+                        var wk = dates[y][m][d].getWeek();
+                        if (wk == lastwk)
+                            weeks[weeks.length-1]["days"] +=1;
+                        else {
+                            weeks.push({"week": wk, "days": 1});
+                        }
+                        lastwk = wk
 					}
 				}
 			}
+            console.log(weeks);
+            for (var week in weeks) {
+                weeksDiv.append(jQuery("<div>", {
+                    "class": "ganttview-hzheader-week", 
+                    "css": {"width": (weeks[week]["days"]*cellWidth - 1)},
+                }).text(weeks[week]["week"]))
+            }
+
             monthsDiv.css("width", totalW + "px");
             daysDiv.css("width", totalW + "px");
-            headerDiv.append(monthsDiv).append(daysDiv);
+            weeksDiv.css("width", totalW + "px");
+            headerDiv.append(monthsDiv).append(weeksDiv).append(daysDiv);
             div.append(headerDiv);
         }
 
@@ -254,6 +274,7 @@ behavior: {
         function applyLastClass(div) {
             jQuery("div.ganttview-grid-row div.ganttview-grid-row-cell:last-child", div).addClass("last");
             jQuery("div.ganttview-hzheader-days div.ganttview-hzheader-day:last-child", div).addClass("last");
+            jQuery("div.ganttview-hzheader-weeks div.ganttview-hzheader-week:last-child", div).addClass("last");
             jQuery("div.ganttview-hzheader-months div.ganttview-hzheader-month:last-child", div).addClass("last");
         }
 		
